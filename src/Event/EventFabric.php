@@ -21,13 +21,12 @@ trait EventReader
         $rank = match (true) {
             $rank === TextCity::RANK_1 => "/rank_1",
             $rank === TextCity::RANK_2 => "/rank_2",
-            $rank === TextCity::RANK_3 => "/rank_3",
-            $rank === TextCity::RANK_4 => "/rank_4",
-            $rank === TextCity::RANK_5 => "/rank_5",
+            default =>  "/rank_1",
         };
 
         $path = __DIR__ . "/.." . Config::PATH_EVENTS . $rank . $filename;
 
+        Logs::writeLog(Logs::FULL_LOG, "event; path -" . $path);
         try {
             $fr = fopen($path, "r");
 
@@ -48,10 +47,13 @@ trait EventReader
 
                 if (!feof($fr))
                     throw new \Exception("Ошибка: неожиданный сбой функций fgets()");
-
                 fclose($fr);
             }
+            else{
+                Logs::writeLog(Logs::FULL_LOG, "event; error open file");
+            }
         } catch (\Throwable $th) {
+            Logs::writeLog(Logs::FULL_LOG, "event; error get file events - " . $th->getMessage());
             print_r($th);
             fclose($fr);
             return false;
@@ -270,8 +272,8 @@ class EventFabric
         Logs::writeLog(Logs::FULL_LOG, "event; start getEvent");
         $event = $secondEvent ? self::getEvent($city, self::getRandomNotNeutralEvent()) : self::getEvent($city, $type);
 
-        Logs::writeLog(Logs::FULL_LOG, "event id - " . $event->getId());
         if ($event !== false) {
+            Logs::writeLog(Logs::FULL_LOG, "event id - " . $event->getId() . "; event type - " . $event->getType());
             Logs::writeLog(Logs::FULL_LOG, "event; result getEvent - true");
             $effPlace = $city->getEffPlace() ? $city->getEffPlace() : [];
             if ($event->getType() === 0) {

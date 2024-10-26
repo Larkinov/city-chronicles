@@ -8,14 +8,15 @@ class Settings
 {
 
     public const ALREADY_START = "Бот уже запущен!";
-    public const NEED_START = "Необходимо сначала запустить бота!";
+    public const NEED_START = "Необходимо сначала запустить бота! Отправьте команду /старт";
     public const WAITING_TIME = "Время ожидания еще не прошло";
     public const WAITING_TIME_CHARACTER = "Ваше время ожидания еще не прошло";
     public const ANOTHER_COMMAND_TEXT = "Такой команды не существует. Для просмотра команд используйте /помощь";
+    public const DONT_HAVE_PERMISSION = "Боту не хватает прав администратора беседы - добавьте ему права администора!";
 
 
     //время ожидания (зависит от множителя) для следующего события или отправки удачи/неудачи
-    public const WAITING_EVENT_HOURS_TIME = 23;
+    public const WAITING_EVENT_HOURS_TIME = 8;
     public const WAITING_GOOD_EVENT_HOURS_TIME = 23;
     public const WAITING_EVIL_EVENT_HOURS_TIME = 23;
 
@@ -37,7 +38,7 @@ class Settings
     }
 
     //настройка выпадения случайных событий
-    public static function getRandomTypeEvent()
+    public static function getRandomTypeEvent():int
     {
         //33% - evil
         //33% - goodness
@@ -54,7 +55,7 @@ class Settings
         //40% - goodness
         //10% - neutral
         $rand = random_int(1, 100);
-        if ($rand >= 1 && $rand <= 39)
+        if ($rand >= 0 && $rand <= 39)
             return -1;
         elseif ($rand > 39 && $rand <= 80)
             return 1;

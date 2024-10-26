@@ -1,6 +1,7 @@
 data
-src/vendor/Config.php
+src/vendor
 src/data_events
 init_server.sh
 logs
-1.txt
+2.txt
+src/DataEvents

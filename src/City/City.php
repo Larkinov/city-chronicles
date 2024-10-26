@@ -64,9 +64,6 @@ class City
         $newrank = match (true) {
             $rank === TextCity::RANK_1 => TextCity::RANK_1,
             $rank === TextCity::RANK_2 => TextCity::RANK_2,
-            $rank === TextCity::RANK_3 => TextCity::RANK_3,
-            $rank === TextCity::RANK_4 => TextCity::RANK_4,
-            $rank === TextCity::RANK_5 => TextCity::RANK_5,
             default => throw new Exception("undefined RANK - $rank"),
         };
         $this->rank = $newrank;
@@ -84,9 +81,6 @@ class City
         $newname = match (true) {
             in_array($name, TextCity::NAME_RANK_1) => $name,
             in_array($name, TextCity::NAME_RANK_2) => $name,
-            in_array($name, TextCity::NAME_RANK_3) => $name,
-            in_array($name, TextCity::NAME_RANK_4) => $name,
-            in_array($name, TextCity::NAME_RANK_5) => $name,
             default => throw new Exception("undefined NAME - $name"),
         };
         $this->name = $newname;

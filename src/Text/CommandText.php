@@ -41,4 +41,13 @@ class CommandText
 
         return $help . $start . $event . $sendGood . $sendEvil . $statistics . $infoCity . $infoCharacter;
     }
+    public static function getHelloCommand()
+    {
+
+        $event = "Каждый день используйте команду: " . CommandText::DAILY_EVENT . " - эта команда получает ежедневное событие которое произошло в городе. Ежедневно можно запустить только одно событие\n\n";
+
+        $end = "Для просмотра всех команд используйте: " . CommandText::HELP . "\n\n";
+
+        return $event . $end;
+    }
 }

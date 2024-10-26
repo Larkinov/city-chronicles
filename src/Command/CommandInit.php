@@ -306,13 +306,25 @@ class CommandInit
             foreach ($eventsData as $eventData) {
                 Logs::writeLog(Logs::FULL_LOG, "start VK message event");
                 $event = new Event($eventData, $bc);
-                $event->runEvent();
-                Logs::writeLog(Logs::FULL_LOG, "end VK message event");
+                $resultEvent = $event->runEvent();
+                if ($resultEvent === true) {
+                    Logs::writeLog(Logs::FULL_LOG, "end VK message event");
+                } else {
+                    Logs::writeLog(Logs::FULL_LOG, "message event error: $resultEvent");
+                    try {
+                        if (stripos($resultEvent, "You don't have access to this chat") !== false) {
+                            $bot = new Bot();
+                            $bot->sendMessage(Settings::DONT_HAVE_PERMISSION, $eventData->getPeerId());
+                        }
+                    } catch (\Throwable $th) {
+                        Logs::writeLog(Logs::FULL_LOG, "error CATCH-ERROR: " . $th->getMessage());
+                    }
+                }
             }
             Logs::writeLog(Logs::FULL_LOG, "end *****************");
         } catch (\Throwable $th) {
             print_r($th);
-            Logs::writeLog(Logs::FULL_LOG, "error CommandInit.php: " . $th->getMessage() . "*****************");
+            Logs::writeLog(Logs::FULL_LOG, "error CommandInit.php: " . json_encode($th) . "*****************");
         }
     }
 }
