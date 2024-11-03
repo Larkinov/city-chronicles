@@ -2,6 +2,7 @@
 
 namespace CityChronicles\Command;
 
+use CityChronicles\Casino\Casino;
 use CityChronicles\Text\TextCharacter;
 use CityChronicles\City\City;
 use CityChronicles\City\CityFabric;
@@ -279,6 +280,34 @@ class CommandInit
             Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::HELP);
         };
 
+
+        // $casino = function (MessageEvent $message) {
+        //     Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::CASINO . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+        //     $city = self::checkingStartBot($message);
+        //     if ($city !== false) {
+        //         $character = $city->getCharacter($message->getFromId());
+        //         $time = $character->getElapsedHoursEvent($character->getLastSendEventTime());
+        //         if ($time > Settings::WAITING_EVIL_EVENT_HOURS_TIME) {
+        //             $casino = new Casino();
+        //             $oldRank = $city->getRank();
+        //             $eventText = EventFabric::startEvent($city, -1, $message->getFromId());
+        //             if ($eventText) {
+        //                 $bot->sendMessage($eventText, $message->getPeerId());
+
+        //                 $newRank =  TextCity::getRank($city->getRich());
+        //                 $text = CommandInit::checkNewRank($oldRank, $newRank, $city);
+        //                 if ($text)
+        //                     $bot->sendMessage($text, $message->getPeerId());
+        //             }
+        //         } else {
+        //             $bot->sendMessage(Settings::getWaitingTimeInfluentialEvent($time), $message->getPeerId());
+        //         }
+        //         $bot = new Bot();
+        //         $bot->sendMessage(CommandText::getAllCommand(), $message->getPeerId());
+        //     }
+        //     Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::CASINO);
+        // };
+
         $bc = new BotCommands();
         $bc->registerNewCommand(CommandText::START_BOT, $startBot);
         $bc->registerNewCommand(CommandText::TIME_START, $startTime);
@@ -292,6 +321,7 @@ class CommandInit
         $bc->registerNewCommand(CommandText::SEND_EVENT_GOOD, $sendEventGood);
         $bc->registerNewCommand(CommandText::SEND_EVENT_EVIL, $sendEventEvil);
         $bc->registerNewCommand(CommandText::HELP, $help);
+        // $bc->registerNewCommand(CommandText::CASINO, $casino);
 
         $bc->registerNewCommandChatEvent(Action::ACTION_INVITE_USER, $newHumanConversation);
 

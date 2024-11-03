@@ -111,14 +111,7 @@ class CityFabric
             $profile->getFirstName(),
             $profile->getLastName(),
             $sex,
-            0,
             $age,
-            TextCharacter::HEALTH[0],
-            0,
-            TextCharacter::PROFESSION_NO,
-            0,
-            0,
-            0,
         );
     }
 
@@ -133,8 +126,6 @@ class CityFabric
             $profile->getLastName(),
             $sex,
             $profile->getIsAdmin(),
-            0,
-            1,
         );
         return $god->getId();
     }

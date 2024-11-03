@@ -151,10 +151,6 @@ class City
         return $arr;
     }
 
-    // public function createNewCharacter(){
-    //     return CharacterFabric::getCharacter($id, $this->peer_id, $this->storagePathCharacter);
-    // }
-
     public function getCharacter(string $id): Character
     {
         return CharacterFabric::getCharacter($id, $this->peer_id, $this->storagePathCharacter);

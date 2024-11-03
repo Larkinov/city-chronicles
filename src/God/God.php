@@ -18,8 +18,6 @@ class God
         private string $lastName = "bot",
         private bool $isMan = false,
         private bool $isAdmin = false,
-        private int $power = 0,
-        private int $faith = 0,
 
     ) {
         $this->profile = new Profile($id,$peer_id,$storagePath);
@@ -29,8 +27,6 @@ class God
         $this->setLastName($lastName);
         $this->setIsMan($isMan);
         $this->setIsAdmin($isAdmin);
-        $this->setPower($power);
-        $this->setFaith($faith);
     }
 
     public function getName():string
@@ -95,27 +91,6 @@ class God
     {
         $this->peer_id=$peer_id;
         $this->profile->saveInfo("peer_id",$peer_id);
-    }
-
-    public function getPower():int
-    {
-        return $this->power;
-    }
-
-    public function setPower(int $power)
-    {
-        $this->power=$power;
-        $this->profile->saveInfo("power",$power);
-    }
-    public function getFaith():int
-    {
-        return $this->faith;
-    }
-
-    public function setFaith(int $faith)
-    {
-        $this->faith=$faith;
-        $this->profile->saveInfo("faith",$faith);
     }
 
 }

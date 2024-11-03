@@ -2,6 +2,7 @@
 
 namespace CityChronicles\Character;
 
+use CityChronicles\Text\TextCharacter;
 use vkbot_conversation\classes\profile\Profile;
 
 class Character
@@ -17,14 +18,12 @@ class Character
         private string $name,
         private string $lastName,
         private int $isMan,
-        private int $faith,
         private int $age,
-        private string $health,
-        private int $money,
-        private string $profession,
-        private int $isBot,
-        private int $luckyCount,
-        private int $unluckyCount,
+        private string $health = TextCharacter::HEALTH[0],
+        private int $money = 0,
+        private string $profession = TextCharacter::PROFESSION_NO,
+        private int $luckyCount = 0,
+        private int $unluckyCount = 0,
         // private int $location,
     ) {
         $this->profile = new Profile($id, $peer_id, $storagePath);
@@ -33,7 +32,6 @@ class Character
         $this->setName($name);
         $this->setLastName($lastName);
         $this->setIsMan($isMan);
-        $this->setFaith($faith);
         $this->setAge($age);
         $this->setHealth($health);
         $this->setMoney($money);
@@ -126,16 +124,7 @@ class Character
         $this->money = $money;
         $this->profile->saveInfo("money", $money);
     }
-    public function getFaith(): int
-    {
-        return $this->faith;
-    }
 
-    public function setFaith(int $faith)
-    {
-        $this->faith = $faith;
-        $this->profile->saveInfo("faith", $faith);
-    }
     public function getProfession(): string
     {
         return $this->profession;
@@ -145,17 +134,6 @@ class Character
     {
         $this->profession = $profession;
         $this->profile->saveInfo("profession", $profession);
-    }
-
-    public function getIsBot(): int
-    {
-        return $this->isBot;
-    }
-
-    public function setIsBot(int $isBot)
-    {
-        $this->isBot = $isBot;
-        $this->profile->saveInfo("isBot", $isBot);
     }
 
     public function getLuckyCount(): int
