@@ -48,8 +48,7 @@ trait EventReader
                 if (!feof($fr))
                     throw new \Exception("Ошибка: неожиданный сбой функций fgets()");
                 fclose($fr);
-            }
-            else{
+            } else {
                 Logs::writeLog(Logs::FULL_LOG, "event; error open file");
             }
         } catch (\Throwable $th) {
@@ -78,7 +77,7 @@ class EventFabric
         return false;
     }
 
-    private static function getEvent(City $city, int $typeEvent): ModelEvent| false
+    private static function getEvent(City $city, int $typeEvent): InfluentialEvent | NeutralEvent | false
     {
         if ($typeEvent === 100)
             $typeEvent = Settings::getRandomTypeEvent();
@@ -145,7 +144,7 @@ class EventFabric
         return $randCharacters;
     }
 
-    private static function goEvent(ModelEvent $event, array $randCharacters, City $city): string
+    private static function goEvent($event, array $randCharacters, City $city): string
     {
 
         $newText = $event->getText();
@@ -197,8 +196,10 @@ class EventFabric
 
                 if ($place) {
                     $places = $city->getEffPlace();
-                    array_push($places, $place);
-                    $city->setEffPlace($places);
+                    if (!in_array($place, $places)) {
+                        array_push($places, $place);
+                        $city->setEffPlace($places);
+                    }
                 }
 
                 if ($event->getEffNameCity()) {
@@ -213,10 +214,10 @@ class EventFabric
         $isAll = $event->getCountCharacter() === -1 ? true : false;
 
         if ($event->getType() === -1)
-            $newText = EventText::getEvilText($arrIdCharacters, $city->getAllGods(), $isAll) . $newText;
+            $newText = EventText::getEvilText($arrIdCharacters, $city->getAllGods(), $isAll, $event->getPlace()) . $newText;
 
         if ($event->getType() === 1)
-            $newText = EventText::getGoodText($arrIdCharacters, $city->getAllGods(), $isAll) . $newText;
+            $newText = EventText::getGoodText($arrIdCharacters, $city->getAllGods(), $isAll, $event->getPlace()) . $newText;
 
         if ($event->getType() === 0)
             $newText = EventText::getNeutralText($arrIdCharacters, $city->getAllGods(), $isAll) . $newText;

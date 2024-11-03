@@ -26,7 +26,6 @@ class CityFabric
             $city->setName(TextCity::getName($city->getRank()));
             $city->setEffPlace([]);
             // $city->setInitConversation("firstLoading");
-            $city->setSpeedTime(TextCity::SPEED_TIME_1);
             $city->updateTimeLive();
             $profiles = $conversation->getProfiles();
 
@@ -46,7 +45,6 @@ class CityFabric
             property_exists($data, "name") && $city->setName($data->name);
             property_exists($data, "effPlace") && $city->setEffPlace($data->effPlace);
             property_exists($data, "initConversation") && $city->setInitConversation("init");
-            property_exists($data, "speedTime") && $city->setSpeedTime($data->speedTime);
             property_exists($data, "timeLive") && $city->setTimeLive($data->timeLive);
 
             property_exists($data, "godsID") && $city->setGodsID($data->godsID);

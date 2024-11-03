@@ -64,57 +64,9 @@ class CommandInit
             $bot = new Bot();
             $bot->sendMessage($messageText, $message->getPeerId());
 
-            if ($city->getSpeedTime() !== TextCity::SPEED_TIME_1) {
-                $city->setSpeedTime(TextCity::SPEED_TIME_1);
-            }
             Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::START_BOT);
         };
 
-
-        $startTime = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::TIME_START . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
-            $city = self::checkingStartBot($message);
-            if ($city !== false) {
-                if ($city->getSpeedTime() !== TextCity::SPEED_TIME_1) {
-                    $city->setSpeedTime(TextCity::SPEED_TIME_1);
-                    $messageText = "Время запущено - скорость обычная";
-                } else
-                    $messageText = "Время уже запущено, скорость обычная";
-                $bot = new Bot();
-                $bot->sendMessage($messageText, $message->getPeerId());
-            }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::TIME_START);
-        };
-
-        $stopTime = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::TIME_STOP . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
-            $city = self::checkingStartBot($message);
-            if ($city !== false) {
-                if ($city->getSpeedTime() !== TextCity::SPEED_TIME_0) {
-                    $city->setSpeedTime(TextCity::SPEED_TIME_0);
-                    $messageText = "Время остановлено";
-                } else
-                    $messageText = "Время уже остановлено!";
-                $bot = new Bot();
-                $bot->sendMessage($messageText, $message->getPeerId());
-            }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::TIME_STOP);
-        };
-
-        $accelerateTime = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::TIME_START_X2 . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
-            $city = self::checkingStartBot($message);
-            if ($city !== false) {
-                if ($city->getSpeedTime() !== TextCity::SPEED_TIME_2) {
-                    $city->setSpeedTime(TextCity::SPEED_TIME_2);
-                    $messageText = "Время запущено - скорость двойная";
-                } else
-                    $messageText = "Время уже запущено - скорость двойная";
-                $bot = new Bot();
-                $bot->sendMessage($messageText, $message->getPeerId());
-            }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::TIME_START_X2);
-        };
 
         $infoCity = function (MessageEvent $message) {
             Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::INFO_CITY . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
@@ -126,7 +78,7 @@ class CommandInit
                     $peopleName .= $value->getName() . " " . $value->getLastName() . ", ";
                 }
                 $peopleName = substr($peopleName, 0, strlen($peopleName) - 2);
-                $messageText = "Название: " . $city->getName() . "\nРанг: " . $city->getRank() . "\nБогатство: " . $city->getRich() . "\nЖители: $peopleName\nСкорость времени: " . $city->getSpeedTime() . "\nПрожито дней: " . $city->getDayLive();
+                $messageText = "Название: " . $city->getName() . "\nРанг: " . $city->getRank() . "\nБогатство: " . $city->getRich() . "\nЖители: $peopleName\nПрожито дней: " . $city->getDayLive();
                 $bot = new Bot();
                 $bot->sendMessage($messageText, $message->getPeerId());
             }
@@ -280,6 +232,31 @@ class CommandInit
             Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::HELP);
         };
 
+        $findMoney = function (MessageEvent $message) {
+            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::FIND_MONEY . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            $city = self::checkingStartBot($message);
+            if ($city !== false) {
+                $bot = new Bot();
+                $character = $city->getCharacter($message->getFromId());
+                $time = $character->getElapsedHoursEvent($character->getLastSendEventTime());
+                if ($time > Settings::WAITING_EVIL_EVENT_HOURS_TIME) {
+                    $oldRank = $city->getRank();
+                    $eventText = EventFabric::startEvent($city, -1, $message->getFromId());
+                    if ($eventText) {
+                        $bot->sendMessage($eventText, $message->getPeerId());
+
+                        $newRank =  TextCity::getRank($city->getRich());
+                        $text = CommandInit::checkNewRank($oldRank, $newRank, $city);
+                        if ($text)
+                            $bot->sendMessage($text, $message->getPeerId());
+                    }
+                } else {
+                    $bot->sendMessage(Settings::getWaitingTimeInfluentialEvent($time), $message->getPeerId());
+                }
+            }
+            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::FIND_MONEY);
+        };
+
 
         // $casino = function (MessageEvent $message) {
         //     Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::CASINO . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
@@ -310,17 +287,14 @@ class CommandInit
 
         $bc = new BotCommands();
         $bc->registerNewCommand(CommandText::START_BOT, $startBot);
-        $bc->registerNewCommand(CommandText::TIME_START, $startTime);
-        $bc->registerNewCommand(CommandText::TIME_START_X2, $accelerateTime);
-        $bc->registerNewCommand(CommandText::TIME_STOP, $stopTime);
         $bc->registerNewCommand(CommandText::INFO_CITY, $infoCity);
-        // $bc->registerNewCommand(CommandText::INFO_GOD, $infoGod);
         $bc->registerNewCommand(CommandText::INFO_PLAYER, $infoCharacter);
         $bc->registerNewCommand(CommandText::DAILY_EVENT, $dailyEvent);
         $bc->registerNewCommand(CommandText::STATISTIC_ALL, $statisticAll);
         $bc->registerNewCommand(CommandText::SEND_EVENT_GOOD, $sendEventGood);
         $bc->registerNewCommand(CommandText::SEND_EVENT_EVIL, $sendEventEvil);
         $bc->registerNewCommand(CommandText::HELP, $help);
+        $bc->registerNewCommand(CommandText::FIND_MONEY, $findMoney);
         // $bc->registerNewCommand(CommandText::CASINO, $casino);
 
         $bc->registerNewCommandChatEvent(Action::ACTION_INVITE_USER, $newHumanConversation);

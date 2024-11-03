@@ -22,8 +22,6 @@ class City
     private array $godsID = [];
     private $conversation;
 
-    private string $speedTime;
-
     //SECONDS!
     private string $timeLive = "0";
 
@@ -171,27 +169,6 @@ class City
         return CharacterFabric::getCharacter($id, $this->peer_id, $this->storagePathCharacter);
     }
 
-
-
-    public function setSpeedTime(string $speedTime)
-    {
-        $newspeed = match (true) {
-            $speedTime === TextCity::SPEED_TIME_0 => TextCity::SPEED_TIME_0,
-            $speedTime === TextCity::SPEED_TIME_1 => TextCity::SPEED_TIME_1,
-            $speedTime === TextCity::SPEED_TIME_2 => TextCity::SPEED_TIME_2,
-            $speedTime === TextCity::SPEED_TIME_3 => TextCity::SPEED_TIME_3,
-            $speedTime === TextCity::SPEED_TIME_4 => TextCity::SPEED_TIME_4,
-            default => throw new Exception("undefined SPEED TIME - $speedTime"),
-        };
-        $this->speedTime = $newspeed;
-        $this->conversation->saveInfo("speedTime", $newspeed);
-    }
-
-    public function getSpeedTime(): string
-    {
-        return $this->speedTime;
-    }
-
     public function getLastTimeEvent(): string
     {
         return $this->lastTimeEvent;
@@ -220,22 +197,12 @@ class City
 
     public function updateTimeLive()
     {
-        $multiplier = match (true) {
-            $this->speedTime === TextCity::SPEED_TIME_0  =>  0,
-            $this->speedTime === TextCity::SPEED_TIME_1  =>  1,
-            $this->speedTime === TextCity::SPEED_TIME_2  =>  2,
-            $this->speedTime === TextCity::SPEED_TIME_3  =>  3,
-            $this->speedTime === TextCity::SPEED_TIME_4  =>  4,
-        };
-
         // $lastTimeEvent = empty($this->lastTimeEvent) ? time() : $this->lastTimeEvent;
         if (empty($this->initConversation))
             $this->setTimeLive("0");
         else {
-            if ($multiplier !== 0) {
-                $lastTime = $this->getLastTimeEvent() !== "null" ? $this->getLastTimeEvent() : time();
-                $this->setTimeLive(floor(intval($this->timeLive) + (((intval($this->timeNow) - intval($lastTime)) * $multiplier))));
-            }
+            $lastTime = $this->getLastTimeEvent() !== "null" ? $this->getLastTimeEvent() : time();
+            $this->setTimeLive(floor(intval($this->timeLive) + (((intval($this->timeNow) - intval($lastTime))))));
         }
     }
 

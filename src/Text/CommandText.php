@@ -6,12 +6,6 @@ class CommandText
 {
     public const START_BOT = "/старт";
 
-    public const TIME_START = "/запустить_время";
-    public const TIME_START_X2 = "/ускорить_время_2";
-    public const TIME_START_X3 = "/ускорить_время_3";
-    public const TIME_START_X4 = "/ускорить_время_4";
-    public const TIME_STOP = "/остановить_время";
-
     public const INFO_CITY = "/инфо_город";
     public const INFO_GOD = "/инфо_бог";
     public const INFO_PLAYER = "/инфо_персонаж";
@@ -25,6 +19,8 @@ class CommandText
     public const STATISTIC_ALL = "/статистика";
 
     public const OTHER_COMMAND = "/другая команда";
+
+    public const FIND_MONEY = "/искать_деньги";
 
     public static function getAllCommand()
     {
