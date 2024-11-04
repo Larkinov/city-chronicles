@@ -250,7 +250,7 @@ class EventFabric
         $randCharacters = self::getCharactersEvents($city, $event->getCountCharacter());
         if ($godId) {
             $character = $city->getCharacter($godId);
-            $character->setLastSendEventTime($city->getTimeNow());
+            $character->updateLastTimeEvent();
         }
         $textEvent = self::goEvent($event, $randCharacters, $city);
         Logs::writeLog(Logs::FULL_LOG, "text event - " . str_replace("\n", " ", $textEvent));

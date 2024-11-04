@@ -29,7 +29,7 @@ class CharacterFabric
         property_exists($data, "profession") ? $fake['profession'] = $data->profession : $fake['profession'] = TextCharacter::getRandomProfession();
         property_exists($data, "luckyCount") ? $fake['luckyCount'] = $data->luckyCount : $fake['luckyCount'] = 0;
         property_exists($data, "unluckyCount") ? $fake['unluckyCount'] = $data->unluckyCount : $fake['unluckyCount'] = 0;
-        property_exists($data, "lastSendEventTime") ? $fake['lastSendEventTime'] = $data->lastSendEventTime : $fake['lastSendEventTime'] = "";
+
         $character = new Character(
             $id,
             $peer_id,
@@ -45,7 +45,6 @@ class CharacterFabric
             $fake['unluckyCount'],
         );
 
-        $character->setLastSendEventTime($fake['lastSendEventTime']);
         return $character;
     }
 

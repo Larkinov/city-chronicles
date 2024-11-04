@@ -57,7 +57,6 @@ class CommandInit
             if ($city->getInitConversation() !== "init") {
                 $messageText = TextCity::getHelloText($city);
                 $city->setInitConversation("init");
-                $city->setLastTimeEvent("null");
             } else
                 $messageText = Settings::ALREADY_START;
 
@@ -140,7 +139,7 @@ class CommandInit
             if ($city !== false) {
                 $bot = new Bot();
                 Settings::getWaitingTimeEvent($city);
-                if ($city->getElapsedHoursEvent() > Settings::WAITING_EVENT_HOURS_TIME) {
+                if ($city->getWaitingHoursEventTime() > Settings::WAITING_EVENT_HOURS_TIME) {
                     $oldRank = $city->getRank();
                     $eventText = EventFabric::startEvent($city);
                     if ($eventText) {
@@ -168,7 +167,7 @@ class CommandInit
             if ($city !== false) {
                 $bot = new Bot();
                 $character = $city->getCharacter($message->getFromId());
-                $time = $character->getElapsedHoursEvent($character->getLastSendEventTime());
+                $time = $character->getWaitingHoursEventTime();
                 if ($time > Settings::WAITING_GOOD_EVENT_HOURS_TIME) {
                     $oldRank = $city->getRank();
                     $eventText = EventFabric::startEvent($city, 1, $message->getFromId());
@@ -193,7 +192,7 @@ class CommandInit
             if ($city !== false) {
                 $bot = new Bot();
                 $character = $city->getCharacter($message->getFromId());
-                $time = $character->getElapsedHoursEvent($character->getLastSendEventTime());
+                $time = $character->getWaitingHoursEventTime();
                 if ($time > Settings::WAITING_EVIL_EVENT_HOURS_TIME) {
                     $oldRank = $city->getRank();
                     $eventText = EventFabric::startEvent($city, -1, $message->getFromId());
@@ -238,7 +237,7 @@ class CommandInit
             if ($city !== false) {
                 $bot = new Bot();
                 $character = $city->getCharacter($message->getFromId());
-                $time = $character->getElapsedHoursEvent($character->getLastSendEventTime());
+                $time = $character->getWaitingHoursEventTime();
                 if ($time > Settings::WAITING_EVIL_EVENT_HOURS_TIME) {
                     $oldRank = $city->getRank();
                     $eventText = EventFabric::startEvent($city, -1, $message->getFromId());
@@ -263,7 +262,7 @@ class CommandInit
         //     $city = self::checkingStartBot($message);
         //     if ($city !== false) {
         //         $character = $city->getCharacter($message->getFromId());
-        //         $time = $character->getElapsedHoursEvent($character->getLastSendEventTime());
+        //         $time = $character->getWaitingHoursEventTime();
         //         if ($time > Settings::WAITING_EVIL_EVENT_HOURS_TIME) {
         //             $casino = new Casino();
         //             $oldRank = $city->getRank();

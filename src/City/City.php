@@ -4,10 +4,12 @@ namespace CityChronicles\City;
 
 use CityChronicles\Character\Character;
 use CityChronicles\Character\CharacterFabric;
+use CityChronicles\Time\Time;
 use CityChronicles\God\God;
 use CityChronicles\God\GodFabric;
-use CityChronicles\Settings\Settings;
 use CityChronicles\Text\TextCity;
+use CityChronicles\Time\FabricLastTime;
+use CityChronicles\Time\TemplateLastTime;
 use Exception;
 use vkbot_conversation\classes\conversation\Conversation;
 
@@ -22,14 +24,9 @@ class City
     private array $godsID = [];
     private $conversation;
 
-    //SECONDS!
-    private string $timeLive = "0";
-
-    //TIMESTAMP!
-    private string $lastTimeEvent;
-
-    //TIMESTAMP!
-    private string $timeNow;
+    private Time $time;
+    private TemplateLastTime $eventTime;
+    private FabricLastTime $fabricLastTime;
 
     public function __construct(
         public string $peer_id,
@@ -37,8 +34,10 @@ class City
         private string $storagePathProfile,
         private string $storagePathCharacter
     ) {
-        $this->timeNow = time();
         $this->conversation = new Conversation($peer_id, $storagePath, $storagePathProfile);
+        $this->time = new Time($this->conversation);
+        $this->fabricLastTime = new FabricLastTime($this->conversation);
+        $this->eventTime = $this->fabricLastTime->getInstance("lastTimeEvent");
     }
 
     public function getRich(): int
@@ -169,56 +168,32 @@ class City
         return CharacterFabric::getCharacter($id, $this->peer_id, $this->storagePathCharacter);
     }
 
-    public function getLastTimeEvent(): string
+    public function getLastTimeEvent(): int
     {
-        return $this->lastTimeEvent;
+        return $this->eventTime->getLastTime();
     }
 
-    public function setLastTimeEvent(string $time)
-    {
-        $this->lastTimeEvent = $time;
-        $this->conversation->saveInfo("lastTimeEvent", $this->lastTimeEvent);
-    }
 
     public function updateLastTimeEvent()
     {
-        $this->lastTimeEvent = $this->timeNow;
-        $this->conversation->saveInfo("lastTimeEvent", $this->lastTimeEvent);
+        $this->eventTime->updateLastTime();
     }
 
-    public function getElapsedHoursEvent(): int
+    public function getWaitingHoursEventTime(): int
     {
-        if ($this->lastTimeEvent === "null")
-            return 24;
-        else
-            return floor((abs(intval($this->lastTimeEvent) - intval($this->timeNow))) / Settings::CITY_WAITING_MULTIPLIER);          //рабочий - считает время в часах
+        return $this->eventTime->getWaitingHoursTime();
     }
 
 
-    public function updateTimeLive()
-    {
-        // $lastTimeEvent = empty($this->lastTimeEvent) ? time() : $this->lastTimeEvent;
-        if (empty($this->initConversation))
-            $this->setTimeLive("0");
-        else {
-            $lastTime = $this->getLastTimeEvent() !== "null" ? $this->getLastTimeEvent() : time();
-            $this->setTimeLive(floor(intval($this->timeLive) + (((intval($this->timeNow) - intval($lastTime))))));
-        }
-    }
 
-    public function getTimeLive(): string
+    public function getTimeLive(): int
     {
-        return $this->timeLive;
-    }
-    public function setTimeLive(string $time)
-    {
-        $this->timeLive = $time;
-        $this->conversation->saveInfo("timeLive", $this->timeLive);
+        return $this->time->getTimeLive();
     }
 
     public function getTimeNow()
     {
-        return $this->timeNow;
+        return time();
     }
 
     public function getDayLive()

@@ -65,7 +65,7 @@ class Settings
 
     public static function getWaitingTimeEvent(City $city): string
     {
-        $timeout = abs($city->getElapsedHoursEvent() - intval(self::WAITING_EVENT_HOURS_TIME));
+        $timeout = abs($city->getWaitingHoursEventTime() - intval(self::WAITING_EVENT_HOURS_TIME));
         $textHour = self::getTextHour($timeout);
         return self::WAITING_TIME . ", до следующего события осталось - $timeout $textHour ⌚";
     }

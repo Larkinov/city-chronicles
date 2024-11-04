@@ -3,13 +3,16 @@
 namespace CityChronicles\Character;
 
 use CityChronicles\Text\TextCharacter;
+use CityChronicles\Time\FabricLastTime;
+use CityChronicles\Time\TemplateLastTime;
 use vkbot_conversation\classes\profile\Profile;
 
 class Character
 {
 
     private Profile $profile;
-    private string $lastSendEventTime = "";
+    private TemplateLastTime $characterEventTime;
+    private FabricLastTime $fabricLastTime;
 
     public function __construct(
         private string $id,
@@ -27,6 +30,8 @@ class Character
         // private int $location,
     ) {
         $this->profile = new Profile($id, $peer_id, $storagePath);
+        $this->fabricLastTime = new FabricLastTime($this->profile);
+        $this->characterEventTime = $this->fabricLastTime->getInstance("lastCharacterTimeEvent");
         $this->setId($id);
         $this->setPeerId($peer_id);
         $this->setName($name);
@@ -156,23 +161,19 @@ class Character
         $this->profile->saveInfo("unluckyCount", $unlucky);
     }
 
-    public function getLastSendEventTime(): string
+    public function getLastTimeEvent(): int
     {
-        return $this->lastSendEventTime;
+        return $this->characterEventTime->getLastTime();
     }
 
-    public function setLastSendEventTime(string $lastSendEventTime)
+
+    public function updateLastTimeEvent()
     {
-        $this->lastSendEventTime = $lastSendEventTime;
-        $this->profile->saveInfo("lastSendEventTime", $lastSendEventTime);
+        $this->characterEventTime->updateLastTime();
     }
 
-    public function getElapsedHoursEvent(string $lastSendEventTime): int
+    public function getWaitingHoursEventTime(): int
     {
-        if ($lastSendEventTime !== "") {
-            return floor((abs(intval(time()) - intval($lastSendEventTime))));
-        }else{
-            return 24;
-        }
+        return $this->characterEventTime->getWaitingHoursTime();
     }
 }

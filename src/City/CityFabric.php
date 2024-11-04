@@ -26,7 +26,6 @@ class CityFabric
             $city->setName(TextCity::getName($city->getRank()));
             $city->setEffPlace([]);
             // $city->setInitConversation("firstLoading");
-            $city->updateTimeLive();
             $profiles = $conversation->getProfiles();
 
             foreach ($profiles as $value) {
@@ -45,16 +44,11 @@ class CityFabric
             property_exists($data, "name") && $city->setName($data->name);
             property_exists($data, "effPlace") && $city->setEffPlace($data->effPlace);
             property_exists($data, "initConversation") && $city->setInitConversation("init");
-            property_exists($data, "timeLive") && $city->setTimeLive($data->timeLive);
 
             property_exists($data, "godsID") && $city->setGodsID($data->godsID);
 
-            property_exists($city, "lastTimeEvent") && $city->setLastTimeEvent($data->lastTimeEvent);
-
             self::addNewProfiles($conversation->getProfiles(), $peer_id, $storagePathProfile, $storagePathCharacters, $city);
 
-            
-            $city->updateTimeLive();
         }
         return $city;
     }
