@@ -9,16 +9,19 @@ class Settings
 
     public const ALREADY_START = "Бот уже запущен!";
     public const NEED_START = "Необходимо сначала запустить бота! Отправьте команду /старт";
-    public const WAITING_TIME = "Время ожидания еще не прошло";
-    public const WAITING_TIME_CHARACTER = "Ваше время ожидания еще не прошло";
     public const ANOTHER_COMMAND_TEXT = "Такой команды не существует. Для просмотра команд используйте /помощь";
     public const DONT_HAVE_PERMISSION = "Боту не хватает прав администратора беседы - добавьте ему права администора!";
 
 
     //время ожидания (зависит от множителя) для следующего события или отправки удачи/неудачи
     public const WAITING_EVENT_HOURS_TIME = 8;
-    public const WAITING_GOOD_EVENT_HOURS_TIME = 23;
-    public const WAITING_EVIL_EVENT_HOURS_TIME = 23;
+    public const WAITING_TIME = "Время ожидания еще не прошло";
+
+    public const WAITING_INFLUENTIAL_EVENT_HOURS_TIME = 23;
+    public const WAITING_TIME_CHARACTER = "Ваше время ожидания еще не прошло";
+
+    public const WAITING_DRINK_BEER_HOURS = 4;
+    public const WAITING_DRINK_BEER_TEXT = "Вы уже пьяны! До отрезвления осталось -";
 
     //множитель подсчета прошедшего времени: 1 - считать разницу в секундах, 3600 - считать разницу в часах
     public const CITY_WAITING_MULTIPLIER = 3600;
@@ -73,8 +76,15 @@ class Settings
 
     public static function getWaitingTimeInfluentialEvent(int $time): string
     {
-        $timeout = abs($time - intval(self::WAITING_EVENT_HOURS_TIME));
+        $timeout = abs($time - intval(self::WAITING_INFLUENTIAL_EVENT_HOURS_TIME));
         $textHour = self::getTextHour($timeout);
-        return self::WAITING_TIME . ", до следующей отправки осталось - $timeout $textHour ⌚";
+        return self::WAITING_TIME_CHARACTER . ", до следующей отправки осталось - $timeout $textHour ⌚";
+    }
+
+    public static function getWaitingTimeDrinkBeer(int $time): string
+    {
+        $timeout = abs($time - intval(self::WAITING_DRINK_BEER_HOURS));
+        $textHour = self::getTextHour($timeout);
+        return self::WAITING_DRINK_BEER_TEXT . " $timeout $textHour ⌚";
     }
 }

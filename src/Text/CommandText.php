@@ -20,7 +20,10 @@ class CommandText
 
     public const OTHER_COMMAND = "/другая команда";
 
+    // addictional commands
     public const FIND_MONEY = "/искать_деньги";
+    public const DRINK_BEER = "/выпить";
+    
 
     public static function getAllCommand()
     {

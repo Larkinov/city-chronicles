@@ -12,6 +12,7 @@ class Character
 
     private Profile $profile;
     private TemplateLastTime $characterEventTime;
+    private TemplateLastTime $drinkBeerTime;
     private FabricLastTime $fabricLastTime;
 
     public function __construct(
@@ -32,6 +33,7 @@ class Character
         $this->profile = new Profile($id, $peer_id, $storagePath);
         $this->fabricLastTime = new FabricLastTime($this->profile);
         $this->characterEventTime = $this->fabricLastTime->getInstance("lastCharacterTimeEvent");
+        $this->drinkBeerTime = $this->fabricLastTime->getInstance("lastDrinkBeerTime");
         $this->setId($id);
         $this->setPeerId($peer_id);
         $this->setName($name);
@@ -175,5 +177,24 @@ class Character
     public function getWaitingHoursEventTime(): int
     {
         return $this->characterEventTime->getWaitingHoursTime();
+    }
+
+
+
+
+    public function getLastTimeDrinkBeer(): int
+    {
+        return $this->drinkBeerTime->getLastTime();
+    }
+
+
+    public function updateLastTimeDrinkBeer()
+    {
+        $this->drinkBeerTime->updateLastTime();
+    }
+
+    public function getWaitingHoursDrinkBeerTime(): int
+    {
+        return $this->drinkBeerTime->getWaitingHoursTime();
     }
 }

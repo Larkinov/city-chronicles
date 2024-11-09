@@ -14,9 +14,9 @@ trait EventReader
     public static function getEventsData(string $rank, int $typeEvent): array|false
     {
         $filename = match (true) {
-            $typeEvent === -1 => Config::FILENAME_EVENTS_EVIL,
-            $typeEvent === 1 => Config::FILENAME_EVENTS_GOODNESS,
-            $typeEvent === 0 => Config::FILENAME_EVENTS_NEUTRAL,
+            $typeEvent === Config::EVENT_EVIL_ID => Config::FILENAME_EVENTS_EVIL,
+            $typeEvent === Config::EVENT_GOODNESS_ID => Config::FILENAME_EVENTS_GOODNESS,
+            $typeEvent === Config::EVENT_NEUTRAL_ID => Config::FILENAME_EVENTS_NEUTRAL,
         };
         $rank = match (true) {
             $rank === TextCity::RANK_1 => "/rank_1",
@@ -89,39 +89,55 @@ class EventFabric
             return false;
         else {
             $rand = array_rand($eventsData);
-
-            if ($typeEvent !== 0) {
-                $event = new InfluentialEvent(
-                    $eventsData[$rand]['id'],
-                    $typeEvent,
-                    $rankEvent,
-                    intval($eventsData[$rand]['count']),
-                    $eventsData[$rand]['next_event_id'],
-                    $eventsData[$rand]['text'],
-                    $eventsData[$rand]['time'],
-                    intval($eventsData[$rand]['eff_mana']),
-                    intval($eventsData[$rand]['eff_plus_rich']),
-                    $eventsData[$rand]['place'],
-                );
-                return $event;
-            } else {
-
-                $event = new NeutralEvent(
-                    $eventsData[$rand]['id'],
-                    $typeEvent,
-                    $rankEvent,
-                    intval($eventsData[$rand]['count']),
-                    $eventsData[$rand]['next_event_id'],
-                    $eventsData[$rand]['text'],
-                    $eventsData[$rand]['time'],
-                    $eventsData[$rand]['eff_name_character'],
-                    $eventsData[$rand]['eff_lastname_character'],
-                    $eventsData[$rand]['eff_proffesion'],
-                    $eventsData[$rand]['eff_name_city'],
-                    intval($eventsData[$rand]['eff_plus_rich']),
-                    $eventsData[$rand]['eff_place_add'],
-                );
-                return $event;
+            switch ($typeEvent) {
+                case Config::EVENT_EVIL_ID:
+                    $event = new InfluentialEvent(
+                        $eventsData[$rand]['id'],
+                        $typeEvent,
+                        $rankEvent,
+                        intval($eventsData[$rand]['count']),
+                        $eventsData[$rand]['next_event_id'],
+                        $eventsData[$rand]['text'],
+                        $eventsData[$rand]['time'],
+                        intval($eventsData[$rand]['eff_mana']),
+                        intval($eventsData[$rand]['eff_plus_rich']),
+                        $eventsData[$rand]['place'],
+                    );
+                    return $event;
+                    break;
+                case Config::EVENT_GOODNESS_ID:
+                    $event = new InfluentialEvent(
+                        $eventsData[$rand]['id'],
+                        $typeEvent,
+                        $rankEvent,
+                        intval($eventsData[$rand]['count']),
+                        $eventsData[$rand]['next_event_id'],
+                        $eventsData[$rand]['text'],
+                        $eventsData[$rand]['time'],
+                        intval($eventsData[$rand]['eff_mana']),
+                        intval($eventsData[$rand]['eff_plus_rich']),
+                        $eventsData[$rand]['place'],
+                    );
+                    return $event;
+                    break;
+                case Config::EVENT_NEUTRAL_ID:
+                    $event = new NeutralEvent(
+                        $eventsData[$rand]['id'],
+                        $typeEvent,
+                        $rankEvent,
+                        intval($eventsData[$rand]['count']),
+                        $eventsData[$rand]['next_event_id'],
+                        $eventsData[$rand]['text'],
+                        $eventsData[$rand]['time'],
+                        $eventsData[$rand]['eff_name_character'],
+                        $eventsData[$rand]['eff_lastname_character'],
+                        $eventsData[$rand]['eff_proffesion'],
+                        $eventsData[$rand]['eff_name_city'],
+                        intval($eventsData[$rand]['eff_plus_rich']),
+                        $eventsData[$rand]['eff_place_add'],
+                    );
+                    return $event;
+                    break;
             }
         }
     }
@@ -277,26 +293,41 @@ class EventFabric
             Logs::writeLog(Logs::FULL_LOG, "event id - " . $event->getId() . "; event type - " . $event->getType());
             Logs::writeLog(Logs::FULL_LOG, "event; result getEvent - true");
             $effPlace = $city->getEffPlace() ? $city->getEffPlace() : [];
-            if ($event->getType() === 0) {
-                if (in_array($event->getEffPlace(), $effPlace)) {
-                    Logs::writeLog(Logs::FULL_LOG, "event; effPlace in City! repeat startEvent()");
-                    $secondTextEvent = self::startEvent($city, $type, $godId, true);
-                    if ($secondTextEvent) {
-                        $textEvent = $secondTextEvent;
-                    } else
-                        $textEvent = false;
-                } else
-                    $textEvent = self::workBaseScript($city, $event, $type, $godId);
-            } else {
-                if (empty($event->getPlace()))
-                    $textEvent = self::workBaseScript($city, $event, $type, $godId);
-                else {
-                    if (in_array($event->getPlace(), $effPlace))
+
+            switch ($event->getType()) {
+                case Config::EVENT_EVIL_ID:
+                    if (empty($event->getPlace()))
                         $textEvent = self::workBaseScript($city, $event, $type, $godId);
-                    else
-                        $textEvent = self::startEvent($city, $type, $godId);
-                }
+                    else {
+                        if (in_array($event->getPlace(), $effPlace))
+                            $textEvent = self::workBaseScript($city, $event, $type, $godId);
+                        else
+                            $textEvent = self::startEvent($city, $type, $godId);
+                    }
+                    break;
+                case Config::EVENT_GOODNESS_ID:
+                    if (empty($event->getPlace()))
+                        $textEvent = self::workBaseScript($city, $event, $type, $godId);
+                    else {
+                        if (in_array($event->getPlace(), $effPlace))
+                            $textEvent = self::workBaseScript($city, $event, $type, $godId);
+                        else
+                            $textEvent = self::startEvent($city, $type, $godId);
+                    }
+                    break;
+                case Config::EVENT_NEUTRAL_ID:
+                    if (in_array($event->getEffPlace(), $effPlace)) {
+                        Logs::writeLog(Logs::FULL_LOG, "event; effPlace in City! repeat startEvent()");
+                        $secondTextEvent = self::startEvent($city, $type, $godId, true);
+                        if ($secondTextEvent) {
+                            $textEvent = $secondTextEvent;
+                        } else
+                            $textEvent = false;
+                    } else
+                        $textEvent = self::workBaseScript($city, $event, $type, $godId);
+                    break;
             }
+
         } else {
             $textEvent = false;
             Logs::writeLog(Logs::FULL_LOG, "event; result getEvent - false");

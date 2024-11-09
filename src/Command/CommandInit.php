@@ -168,9 +168,9 @@ class CommandInit
                 $bot = new Bot();
                 $character = $city->getCharacter($message->getFromId());
                 $time = $character->getWaitingHoursEventTime();
-                if ($time > Settings::WAITING_GOOD_EVENT_HOURS_TIME) {
+                if ($time > Settings::WAITING_INFLUENTIAL_EVENT_HOURS_TIME) {
                     $oldRank = $city->getRank();
-                    $eventText = EventFabric::startEvent($city, 1, $message->getFromId());
+                    $eventText = EventFabric::startEvent($city, Config::EVENT_GOODNESS_ID, $message->getFromId());
                     if ($eventText) {
                         $bot->sendMessage($eventText, $message->getPeerId());
 
@@ -193,9 +193,9 @@ class CommandInit
                 $bot = new Bot();
                 $character = $city->getCharacter($message->getFromId());
                 $time = $character->getWaitingHoursEventTime();
-                if ($time > Settings::WAITING_EVIL_EVENT_HOURS_TIME) {
+                if ($time > Settings::WAITING_INFLUENTIAL_EVENT_HOURS_TIME) {
                     $oldRank = $city->getRank();
-                    $eventText = EventFabric::startEvent($city, -1, $message->getFromId());
+                    $eventText = EventFabric::startEvent($city, Config::EVENT_EVIL_ID, $message->getFromId());
                     if ($eventText) {
                         $bot->sendMessage($eventText, $message->getPeerId());
 
@@ -231,30 +231,58 @@ class CommandInit
             Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::HELP);
         };
 
-        $findMoney = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::FIND_MONEY . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+        
+        $drinkBeer = function (MessageEvent $message) {
+            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::DRINK_BEER . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $bot = new Bot();
                 $character = $city->getCharacter($message->getFromId());
-                $time = $character->getWaitingHoursEventTime();
-                if ($time > Settings::WAITING_EVIL_EVENT_HOURS_TIME) {
-                    $oldRank = $city->getRank();
-                    $eventText = EventFabric::startEvent($city, -1, $message->getFromId());
-                    if ($eventText) {
-                        $bot->sendMessage($eventText, $message->getPeerId());
+                $time = $character->getWaitingHoursDrinkBeerTime();
+                if ($time > Settings::WAITING_DRINK_BEER_HOURS) {
+                    $bot->sendMessage("Пивандрий", $message->getPeerId());
+                    // $oldRank = $city->getRank();
+                    // $eventText = EventFabric::startEvent($city, Config::EVENT_DRINK_TIME_ID, $message->getFromId());
+                    // if ($eventText) {
+                    //     $bot->sendMessage($eventText, $message->getPeerId());
 
-                        $newRank =  TextCity::getRank($city->getRich());
-                        $text = CommandInit::checkNewRank($oldRank, $newRank, $city);
-                        if ($text)
-                            $bot->sendMessage($text, $message->getPeerId());
-                    }
+                    //     $newRank =  TextCity::getRank($city->getRich());
+                    //     $text = CommandInit::checkNewRank($oldRank, $newRank, $city);
+                    //     if ($text)
+                    //         $bot->sendMessage($text, $message->getPeerId());
+                    // }
                 } else {
-                    $bot->sendMessage(Settings::getWaitingTimeInfluentialEvent($time), $message->getPeerId());
+                    $bot->sendMessage(Settings::getWaitingTimeDrinkBeer($time), $message->getPeerId());
                 }
             }
             Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::FIND_MONEY);
         };
+
+
+        // $findMoney = function (MessageEvent $message) {
+        //     Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::FIND_MONEY . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+        //     $city = self::checkingStartBot($message);
+        //     if ($city !== false) {
+        //         $bot = new Bot();
+        //         $character = $city->getCharacter($message->getFromId());
+        //         $time = $character->getWaitingHoursEventTime();
+        //         if ($time > Settings::WAITING_EVIL_EVENT_HOURS_TIME) {
+        //             $oldRank = $city->getRank();
+        //             $eventText = EventFabric::startEvent($city, -1, $message->getFromId());
+        //             if ($eventText) {
+        //                 $bot->sendMessage($eventText, $message->getPeerId());
+
+        //                 $newRank =  TextCity::getRank($city->getRich());
+        //                 $text = CommandInit::checkNewRank($oldRank, $newRank, $city);
+        //                 if ($text)
+        //                     $bot->sendMessage($text, $message->getPeerId());
+        //             }
+        //         } else {
+        //             $bot->sendMessage(Settings::getWaitingTimeInfluentialEvent($time), $message->getPeerId());
+        //         }
+        //     }
+        //     Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::FIND_MONEY);
+        // };
 
 
         // $casino = function (MessageEvent $message) {
@@ -293,7 +321,8 @@ class CommandInit
         $bc->registerNewCommand(CommandText::SEND_EVENT_GOOD, $sendEventGood);
         $bc->registerNewCommand(CommandText::SEND_EVENT_EVIL, $sendEventEvil);
         $bc->registerNewCommand(CommandText::HELP, $help);
-        $bc->registerNewCommand(CommandText::FIND_MONEY, $findMoney);
+        $bc->registerNewCommand(CommandText::DRINK_BEER, $drinkBeer);
+        // $bc->registerNewCommand(CommandText::FIND_MONEY, $findMoney);
         // $bc->registerNewCommand(CommandText::CASINO, $casino);
 
         $bc->registerNewCommandChatEvent(Action::ACTION_INVITE_USER, $newHumanConversation);
