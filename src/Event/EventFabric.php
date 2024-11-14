@@ -26,7 +26,7 @@ trait EventReader
 
         $path = __DIR__ . "/.." . Config::PATH_EVENTS . $rank . $filename;
 
-        Logs::writeLog(Logs::FULL_LOG, "event; path -" . $path);
+        Logs::writeLog(Logs::MAIN_LOG, "event; path -" . $path);
         try {
             $fr = fopen($path, "r");
 
@@ -49,10 +49,10 @@ trait EventReader
                     throw new \Exception("Ошибка: неожиданный сбой функций fgets()");
                 fclose($fr);
             } else {
-                Logs::writeLog(Logs::FULL_LOG, "event; error open file");
+                Logs::writeLog(Logs::MAIN_LOG, "event; error open file");
             }
         } catch (\Throwable $th) {
-            Logs::writeLog(Logs::FULL_LOG, "event; error get file events - " . $th->getMessage());
+            Logs::writeLog(Logs::MAIN_LOG, "event; error get file events - " . $th->getMessage());
             print_r($th);
             fclose($fr);
             return false;
@@ -269,7 +269,7 @@ class EventFabric
             $character->updateLastTimeEvent();
         }
         $textEvent = self::goEvent($event, $randCharacters, $city);
-        Logs::writeLog(Logs::FULL_LOG, "text event - " . str_replace("\n", " ", $textEvent));
+        Logs::writeLog(Logs::MAIN_LOG, "text event - " . str_replace("\n", " ", $textEvent));
 
         if ($event->getType() === 0) {
             $secondTextEvent = self::startEvent($city, $type, $godId, true);
@@ -286,12 +286,12 @@ class EventFabric
         string $godId = "",
         bool $secondEvent = false,
     ): string|false {
-        Logs::writeLog(Logs::FULL_LOG, "event; start getEvent");
+        Logs::writeLog(Logs::MAIN_LOG, "event; start getEvent");
         $event = $secondEvent ? self::getEvent($city, self::getRandomNotNeutralEvent()) : self::getEvent($city, $type);
 
         if ($event !== false) {
-            Logs::writeLog(Logs::FULL_LOG, "event id - " . $event->getId() . "; event type - " . $event->getType());
-            Logs::writeLog(Logs::FULL_LOG, "event; result getEvent - true");
+            Logs::writeLog(Logs::MAIN_LOG, "event id - " . $event->getId() . "; event type - " . $event->getType());
+            Logs::writeLog(Logs::MAIN_LOG, "event; result getEvent - true");
             $effPlace = $city->getEffPlace() ? $city->getEffPlace() : [];
 
             switch ($event->getType()) {
@@ -317,7 +317,7 @@ class EventFabric
                     break;
                 case Config::EVENT_NEUTRAL_ID:
                     if (in_array($event->getEffPlace(), $effPlace)) {
-                        Logs::writeLog(Logs::FULL_LOG, "event; effPlace in City! repeat startEvent()");
+                        Logs::writeLog(Logs::MAIN_LOG, "event; effPlace in City! repeat startEvent()");
                         $secondTextEvent = self::startEvent($city, $type, $godId, true);
                         if ($secondTextEvent) {
                             $textEvent = $secondTextEvent;
@@ -330,7 +330,7 @@ class EventFabric
 
         } else {
             $textEvent = false;
-            Logs::writeLog(Logs::FULL_LOG, "event; result getEvent - false");
+            Logs::writeLog(Logs::MAIN_LOG, "event; result getEvent - false");
         }
 
         return $textEvent;

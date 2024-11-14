@@ -23,6 +23,19 @@ use vkbot_conversation\classes\message\Action;
 class CommandInit
 {
 
+    private static function getInfoMessage(MessageEvent $message): string
+    {
+        $log = "id - " . $message->getId()
+            . "; date - " . $message->getDate()
+            . "; peer_id - " . $message->getPeerId()
+            . "; from_id - " . $message->getFromId()
+            . "; text - " . $message->getText()
+            . "; member count - " .  json_encode($message->getMembersCount())
+            . "; action - " .  json_encode($message->getAction());
+
+        return $log;
+    }
+
     private static function checkingStartBot(MessageEvent $message): City|false
     {
         $city = CityFabric::getCity($message->getPeerId(), Config::PATH_CITY, Config::PATH_GODS, Config::PATH_CHARACTERS);
@@ -51,7 +64,8 @@ class CommandInit
     {
 
         $startBot = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::START_BOT . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::START_BOT . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::START_BOT . "; " .  self::getInfoMessage($message));
             $city = CityFabric::getCity($message->getPeerId(), Config::PATH_CITY, Config::PATH_GODS, Config::PATH_CHARACTERS);
 
             if ($city->getInitConversation() !== "init") {
@@ -63,12 +77,14 @@ class CommandInit
             $bot = new Bot();
             $bot->sendMessage($messageText, $message->getPeerId());
 
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::START_BOT);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::START_BOT);
         };
 
 
         $infoCity = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::INFO_CITY . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::INFO_CITY . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::INFO_CITY . "; " .  self::getInfoMessage($message));
+
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $people = $city->getAllCharacter();
@@ -81,12 +97,14 @@ class CommandInit
                 $bot = new Bot();
                 $bot->sendMessage($messageText, $message->getPeerId());
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::INFO_CITY);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::INFO_CITY);
         };
 
 
         $infoCharacter = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::INFO_PLAYER . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::INFO_PLAYER . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::INFO_PLAYER . "; " .  self::getInfoMessage($message));
+
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $character = $city->getCharacter($message->getFromId());
@@ -94,11 +112,17 @@ class CommandInit
                 $bot = new Bot();
                 $bot->sendMessage($messageText, $message->getPeerId());
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::INFO_PLAYER);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::INFO_PLAYER);
         };
 
         $statisticAll = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::STATISTIC_ALL . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::STATISTIC_ALL . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::STATISTIC_ALL . "; " . self::getInfoMessage($message));
+
+
+
+
+
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $characters = $city->getAllCharacter();
@@ -116,11 +140,13 @@ class CommandInit
                 $bot = new Bot();
                 $bot->sendMessage($messageText, $message->getPeerId());
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::STATISTIC_ALL);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::STATISTIC_ALL);
         };
 
         $newHumanConversation = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, Action::ACTION_INVITE_USER . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, Action::ACTION_INVITE_USER . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . Action::ACTION_INVITE_USER . "; " .  self::getInfoMessage($message));
+
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $bot = new Bot();
@@ -129,11 +155,13 @@ class CommandInit
                 $text = TextConverter::convertTextGenderCommaFullName($text, $character->getIsMan(), $character->getName() . " " . $character->getLastName());
                 $bot->sendMessage($text, $message->getPeerId());
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " .  Action::ACTION_INVITE_USER);
+            Logs::writeLog(Logs::MAIN_LOG, "end " .  Action::ACTION_INVITE_USER);
         };
 
         $dailyEvent = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::DAILY_EVENT . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::DAILY_EVENT . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::DAILY_EVENT . "; " .  self::getInfoMessage($message));
+
             $city = self::checkingStartBot($message);
 
             if ($city !== false) {
@@ -156,13 +184,15 @@ class CommandInit
                     $bot->sendMessage(Settings::getWaitingTimeEvent($city), $message->getPeerId());
                 }
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::DAILY_EVENT);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::DAILY_EVENT);
         };
 
 
 
         $sendEventGood = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::SEND_EVENT_GOOD . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::SEND_EVENT_GOOD . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::SEND_EVENT_GOOD . "; " .  self::getInfoMessage($message));
+
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $bot = new Bot();
@@ -183,11 +213,13 @@ class CommandInit
                     $bot->sendMessage(Settings::getWaitingTimeInfluentialEvent($time), $message->getPeerId());
                 }
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::SEND_EVENT_GOOD);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::SEND_EVENT_GOOD);
         };
 
         $sendEventEvil = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::SEND_EVENT_EVIL . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::SEND_EVENT_EVIL . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::SEND_EVENT_EVIL . "; " .  self::getInfoMessage($message));
+
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $bot = new Bot();
@@ -208,32 +240,38 @@ class CommandInit
                     $bot->sendMessage(Settings::getWaitingTimeInfluentialEvent($time), $message->getPeerId());
                 }
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::SEND_EVENT_EVIL);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::SEND_EVENT_EVIL);
         };
 
         $sendMessageOtherCommand = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::OTHER_COMMAND . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::OTHER_COMMAND . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::OTHER_COMMAND . "; " .  self::getInfoMessage($message));
+
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $bot = new Bot();
                 $bot->sendMessage(Settings::ANOTHER_COMMAND_TEXT, $message->getPeerId());
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::OTHER_COMMAND);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::OTHER_COMMAND);
         };
 
         $help = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::HELP . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::HELP . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::HELP . "; " .  self::getInfoMessage($message));
+
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $bot = new Bot();
                 $bot->sendMessage(CommandText::getAllCommand(), $message->getPeerId());
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::HELP);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::HELP);
         };
 
-        
+
         $drinkBeer = function (MessageEvent $message) {
-            Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::DRINK_BEER . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::DRINK_BEER . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+            Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::DRINK_BEER . "; " .  self::getInfoMessage($message));
+
             $city = self::checkingStartBot($message);
             if ($city !== false) {
                 $bot = new Bot();
@@ -255,12 +293,14 @@ class CommandInit
                     $bot->sendMessage(Settings::getWaitingTimeDrinkBeer($time), $message->getPeerId());
                 }
             }
-            Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::FIND_MONEY);
+            Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::FIND_MONEY);
         };
 
 
         // $findMoney = function (MessageEvent $message) {
-        //     Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::FIND_MONEY . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+        //     Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::FIND_MONEY . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+        // Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::FIND_MONEY . "; " .  self::getInfoMessage($message));
+
         //     $city = self::checkingStartBot($message);
         //     if ($city !== false) {
         //         $bot = new Bot();
@@ -281,12 +321,14 @@ class CommandInit
         //             $bot->sendMessage(Settings::getWaitingTimeInfluentialEvent($time), $message->getPeerId());
         //         }
         //     }
-        //     Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::FIND_MONEY);
+        //     Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::FIND_MONEY);
         // };
 
 
         // $casino = function (MessageEvent $message) {
-        //     Logs::writeLog(Logs::FULL_LOG, "start command " . CommandText::CASINO . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+        //     Logs::writeLog(Logs::MAIN_LOG, "start command " . CommandText::CASINO . "; " . $message->getPeerId() . " - peer_id; " . $message->getFromId() . " - from_id;");
+        // Logs::writeLog(Logs::FULL_MESSAGE_LOG, "start command " . CommandText::CASINO . "; " .  self::getInfoMessage($message));
+
         //     $city = self::checkingStartBot($message);
         //     if ($city !== false) {
         //         $character = $city->getCharacter($message->getFromId());
@@ -309,7 +351,7 @@ class CommandInit
         //         $bot = new Bot();
         //         $bot->sendMessage(CommandText::getAllCommand(), $message->getPeerId());
         //     }
-        //     Logs::writeLog(Logs::FULL_LOG, "end " . CommandText::CASINO);
+        //     Logs::writeLog(Logs::MAIN_LOG, "end " . CommandText::CASINO);
         // };
 
         $bc = new BotCommands();
@@ -332,31 +374,31 @@ class CommandInit
         echo '<pre>';
 
         try {
-            Logs::writeLog(Logs::FULL_LOG, "connection server *****************");
+            Logs::writeLog(Logs::MAIN_LOG, "connection server *****************");
             $server->connection();
             $eventsData = $server->getEventsData();
             foreach ($eventsData as $eventData) {
-                Logs::writeLog(Logs::FULL_LOG, "start VK message event");
+                Logs::writeLog(Logs::MAIN_LOG, "start VK message event");
                 $event = new Event($eventData, $bc);
                 $resultEvent = $event->runEvent();
                 if ($resultEvent === true) {
-                    Logs::writeLog(Logs::FULL_LOG, "end VK message event");
+                    Logs::writeLog(Logs::MAIN_LOG, "end VK message event");
                 } else {
-                    Logs::writeLog(Logs::FULL_LOG, "message event error: $resultEvent");
+                    Logs::writeLog(Logs::MAIN_LOG, "message event error: $resultEvent");
                     try {
                         if (stripos($resultEvent, "You don't have access to this chat") !== false) {
                             $bot = new Bot();
                             $bot->sendMessage(Settings::DONT_HAVE_PERMISSION, $eventData->getPeerId());
                         }
                     } catch (\Throwable $th) {
-                        Logs::writeLog(Logs::FULL_LOG, "error CATCH-ERROR: " . $th->getMessage());
+                        Logs::writeLog(Logs::MAIN_LOG, "error CATCH-ERROR: " . $th->getMessage());
                     }
                 }
             }
-            Logs::writeLog(Logs::FULL_LOG, "end *****************");
+            Logs::writeLog(Logs::MAIN_LOG, "end *****************");
         } catch (\Throwable $th) {
             print_r($th);
-            Logs::writeLog(Logs::FULL_LOG, "error CommandInit.php: " . json_encode($th) . "*****************");
+            Logs::writeLog(Logs::MAIN_LOG, "error CommandInit.php: " . json_encode($th) . "*****************");
         }
     }
 }

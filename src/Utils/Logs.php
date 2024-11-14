@@ -7,7 +7,8 @@ class Logs
 
     private const LOG_STORAGE = __DIR__ . "/../../logs";
 
-    public const FULL_LOG = "full_log";
+    public const MAIN_LOG = "main_log";
+    public const FULL_MESSAGE_LOG = "full_message_log";
 
     public static function writeLog(string $filename, string $log)
     {
